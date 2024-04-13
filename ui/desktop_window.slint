@@ -1,0 +1,149 @@
+// Copyright © SixtyFPS GmbH <info@slint.dev>
+// SPDX-License-Identifier: MIT
+
+import { Theme, ScreenSize } from "theme.slint";
+import { BarTileModel } from "widgets/widgets.slint";
+import { Images } from "images.slint";
+import { Theme } from "theme.slint";
+import { Navigation, MenuButton, Menu, Value } from "widgets/widgets.slint";
+import { BalanceAdapter, OverviewAdapter, UsageAdapter, WeatherAdapter, MenuPageAdapter, MenuOverviewAdapter, SettingsAdapter } from "pages/pages.slint";
+import { KioskOverlay } from "blocks/kiosk_overlay.slint";
+import { Header, HeaderAdapter } from "blocks/blocks.slint";
+import { Menu, PageScrollView, PageContainer } from "widgets/widgets.slint";
+import { Balance, Overview, Usage, UsageAdapter, Weather, About } from "pages/pages.slint";
+import { Guestos } from "pages/guestos.slint";
+
+export { OverviewAdapter, UsageAdapter, Value, WeatherAdapter, MenuPageAdapter, MenuOverviewAdapter, SettingsAdapter,
+    BarTileModel, Images, HeaderAdapter }
+
+
+export global Client {
+    // 导出全局单例：Rust代码可以操作
+    callback xview_connect();
+}    
+
+export component MainWindow inherits Window {
+    private property <length> big-break-point: 1366px;
+    private property <length> mid-break-point: 799px;
+    private property <length> mobile-break-point: 444px;
+
+    title: "Xview-lander";
+    min-width: 800px;
+    min-height: 480px;
+    background: Theme.palette.pure-black;
+    preferred-width: 800px;
+    preferred-height: 480px;
+
+    Rectangle {
+        background: Theme.palette.background-gradient;
+
+        VerticalLayout {
+            padding-bottom: 50px;
+
+            Header {}
+
+            i-page-scroll-view := PageScrollView {
+                vertical-stretch: 1;
+                page-count: 6;
+
+                PageContainer {
+                    //clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
+                    in-out property <bool> hit:false;
+                    callback click;
+                    click => {
+                        self.hit = true
+                    }
+                    clicked => { 
+                        if (!self.hit){
+                            i-page-scroll-view.toggle-selection(self.index, self.x); 
+                            Client.xview_connect();
+                            self.click();
+                        } else{
+                            i-page-scroll-view.toggle-selection(self.index, self.x); 
+                            self.hit = false
+                        }
+
+                    }
+
+                    index: 0;
+                    selected <=> i-page-scroll-view.selection;
+                    selected-width: i-page-scroll-view.selected-width;
+                    selected-height: i-page-scroll-view.selected-height;
+                    selected-h-offset: i-page-scroll-view.selected-h-offset;
+
+                    //Overview {}
+                    Guestos {}
+                }
+
+                PageContainer {
+                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
+
+                    index: 1;
+                    selected <=> i-page-scroll-view.selection;
+                    selected-width: i-page-scroll-view.selected-width;
+                    selected-height: i-page-scroll-view.selected-height;
+                    selected-h-offset: i-page-scroll-view.selected-h-offset;
+
+                    //Usage {}
+                    Guestos {}
+                }
+
+                PageContainer {
+                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
+
+                    index: 2;
+                    selected <=> i-page-scroll-view.selection;
+                    selected-width: i-page-scroll-view.selected-width;
+                    selected-height: i-page-scroll-view.selected-height;
+                    selected-h-offset: i-page-scroll-view.selected-h-offset;
+
+                    //Balance {}
+                    Guestos {}
+                }
+
+                PageContainer {
+                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
+
+                    index: 3;
+                    selected <=> i-page-scroll-view.selection;
+                    selected-width: i-page-scroll-view.selected-width;
+                    selected-height: i-page-scroll-view.selected-height;
+                    selected-h-offset: i-page-scroll-view.selected-h-offset;
+
+                    //Weather {}
+                    Guestos {}
+                }
+
+                PageContainer {
+                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
+
+                    index: 4;
+                    selected <=> i-page-scroll-view.selection;
+                    selected-width: i-page-scroll-view.selected-width;
+                    selected-height: i-page-scroll-view.selected-height;
+                    selected-h-offset: i-page-scroll-view.selected-h-offset;
+
+                    //About {}
+                    Guestos {}
+                }
+
+                PageContainer {
+                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
+
+                    index: 5;
+                    selected <=> i-page-scroll-view.selection;
+                    selected-width: i-page-scroll-view.selected-width;
+                    selected-height: i-page-scroll-view.selected-height;
+                    selected-h-offset: i-page-scroll-view.selected-h-offset;
+
+                    Guestos {}
+                }
+            }
+        }
+    }
+}
+
+
+
+
+

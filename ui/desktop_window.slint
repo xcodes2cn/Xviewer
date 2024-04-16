@@ -12,6 +12,7 @@ import { Header, HeaderAdapter } from "blocks/blocks.slint";
 import { Menu, PageScrollView, PageContainer } from "widgets/widgets.slint";
 import { Balance, Overview, Usage, UsageAdapter, Weather, About } from "pages/pages.slint";
 import { Guestos } from "pages/guestos.slint";
+import { LoginWindow } from "pages/login.slint";
 
 export { OverviewAdapter, UsageAdapter, Value, WeatherAdapter, MenuPageAdapter, MenuOverviewAdapter, SettingsAdapter,
     BarTileModel, Images, HeaderAdapter }
@@ -31,8 +32,10 @@ export component MainWindow inherits Window {
     min-width: 800px;
     min-height: 480px;
     background: Theme.palette.pure-black;
-    preferred-width: 800px;
-    preferred-height: 480px;
+    //preferred-width: 800px;
+    //preferred-height: 480px;
+    preferred-height: 800px;
+    preferred-width: 100%;
 
     Rectangle {
         background: Theme.palette.background-gradient;

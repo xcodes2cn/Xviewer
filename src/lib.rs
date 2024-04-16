@@ -1,9 +1,13 @@
 // Copyright © SixtyFPS GmbH <info@slint.dev>
 // SPDX-License-Identifier: MIT
-
 slint::include_modules!();
 
 pub fn main() {
+    //let login_window = LoginWindow::new().unwrap();
+    //login_window.set_visible(true);
+    //login_window.set_always_on_top(true);
+
+    
     let window = MainWindow::new().unwrap();
     window.global::<Client>().on_xview_connect(move || {
         call_remote_viewer::run()

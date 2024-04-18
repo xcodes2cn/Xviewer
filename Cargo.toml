@@ -4,7 +4,7 @@ description = "iCS desktop client."
 version = "0.1.0"
 authors = ["noone <mgr@xcodes.com.cn>"]
 readme = "README.md"
-repository = "https://github.com/xcodes2cn/Xview_lander"
+repository = "https://github.com/xcodes2cn/Xviwer"
 publish = false
 edition = "2021"
 rust-version = "1.77.1"
@@ -15,6 +15,7 @@ license = "MIT"
 crate-type = ["cdylib", "lib"]
 
 [dependencies]
+base64 = "0.13.0"
 slint = { path = "../slint/api/rs/slint", default-features = false, features = ["compat-1-2"] }
 chrono = { version = "0.4.34", optional = true, default-features = false, features = ["clock", "std", "wasmbind"] }
 weer_api = { version = "0.1", optional = true }

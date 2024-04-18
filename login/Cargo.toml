@@ -6,6 +6,10 @@ edition = "2021"
 [dependencies]
 slint = "1.5.1"
 anyhow = "1"
+base64 = "0.13.0"
 
 [build-dependencies]
 slint-build = "1.5.1"
+
+[dependencies.redis]
+version = "*"

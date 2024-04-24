@@ -1,2 +1,2 @@
-# Xviewer
-VDI client using remote-viewer.
+# Xview_lander
+Rust iCS desktop client.

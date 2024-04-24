@@ -1,5 +1,7 @@
 import { Images } from "../../ui/images.slint";
 import { BarBackground } from "../../ui/widgets/chart_pattern.slint";
+//import { License } from "./blocks/blocks.slint";
+
 export component BorderlessWindow inherits Window{
     no-frame: true;
     min-width: 200px;
@@ -17,12 +19,13 @@ export component BorderlessWindow inherits Window{
     property <length> drag-area-down-y: 0;
 
     property <bool> is-maximized: false;
+    //property <bool> is-maximized: true;
     
     callback on-close-window();
-    //callback on-move-window(length, length);
-    //callback on-minimized-window(bool);
-    //callback on-maximized-window(bool);
-/*
+    callback on-move-window(length, length);
+    callback on-minimized-window(bool);
+    callback on-maximized-window(bool);
+
     function resize-window(width: length, height: length) {
         if(width < root.min-width){
             root.width = root.min-width;
@@ -177,7 +180,7 @@ export component BorderlessWindow inherits Window{
             process-drag-event(8, ev, self.mouse-x, self.mouse-y);
         }
     }
-*/
+
     VerticalLayout {
         padding: root.border-width;
         //标题栏
@@ -192,12 +195,13 @@ export component BorderlessWindow inherits Window{
                     text: root.title;
                     color: title-text-color;
                     vertical-alignment: center;
-                    /*TouchArea {
+                    TouchArea {
                         pointer-event(ev) => {
                             process-drag-event(0, ev, self.mouse-x, self.mouse-y);
                         }
-                    }*/
+                    }
                 }
+                
                 /*
                 //最小化按钮
                 Rectangle {
@@ -239,6 +243,7 @@ export component BorderlessWindow inherits Window{
                     width: 20px;
                 }
                 */
+                
                 //关闭按钮
                 Rectangle {
                     y: 7px;

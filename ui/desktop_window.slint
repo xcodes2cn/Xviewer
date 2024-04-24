@@ -13,140 +13,104 @@ import { Menu, PageScrollView, PageContainer } from "widgets/widgets.slint";
 import { Balance, Overview, Usage, UsageAdapter, Weather, About } from "pages/pages.slint";
 import { Guestos } from "pages/guestos.slint";
 import { LoginWindow } from "pages/login.slint";
+import { BarBackground } from "widgets/chart_pattern.slint";
 
 export { OverviewAdapter, UsageAdapter, Value, WeatherAdapter, MenuPageAdapter, MenuOverviewAdapter, SettingsAdapter,
     BarTileModel, Images, HeaderAdapter }
 
-
 export global Client {
+    //in property <[guestos_data]> name;
     // 导出全局单例：Rust代码可以操作
-    callback xview_connect();
+    callback xview_connect(string, string);
 }    
 
-export component MainWindow inherits Window {
-    private property <length> big-break-point: 1366px;
-    private property <length> mid-break-point: 799px;
-    private property <length> mobile-break-point: 444px;
+// Added:
+export struct guestos_data {
+    gname: string,
+    guri: string,
+}
 
-    title: "Xview-lander";
+export component MainWindow inherits Window {
+
+    title: "☁️";
+    icon: Images.logo;
     min-width: 800px;
     min-height: 480px;
     background: Theme.palette.pure-black;
-    //preferred-width: 800px;
-    //preferred-height: 480px;
-    preferred-height: 200px;
+    preferred-height: 700px;
     preferred-width: 100%;
 
+    in property <[guestos_data]> myguestos: [
+        { gname: "综合桌面", guri: "spice://192.168.10.1:5905"},
+        { gname: "分析桌面", guri: "spice://192.168.10.1:5903"},
+        { gname: "监控桌面", guri: "spice://192.168.10.1:5901"},
+        { gname: "指挥桌面", guri: "spice://192.168.10.2:5901"},
+        { gname: "运行桌面", guri: "spice://192.168.10.2:5903"},
+        { gname: "Kylin桌面", guri: "spice://192.168.10.2:5903"},
+        { gname: "Windows桌面", guri: "spice://192.168.10.2:5903"},
+        { gname: "运行桌面2", guri: "spice://192.168.10.2:5903"},
+        { gname: "运行桌面3", guri: "spice://192.168.10.2:5903"},
+        { gname: "运行桌面4", guri: "spice://192.168.10.2:5903"},
+        { gname: "运行桌面5", guri: "spice://192.168.10.2:5903"},
+        { gname: "运行桌面6", guri: "spice://192.168.10.2:5903"},
+        { gname: "运行桌面7", guri: "spice://192.168.10.2:5903"},
+        { gname: "财务桌面", guri: "spice://192.168.10.2:5903"},
+        { gname: "IT桌面", guri: "spice://192.168.10.2:5903"},
+        { gname: "HR桌面", guri: "spice://192.168.10.2:5903"},
+        { gname: "运维桌面", guri: "spice://192.168.10.2:5903"},
+        { gname: "研发桌面", guri: "spice://192.168.10.2:5903"},
+        { gname: "行政桌面", guri: "spice://192.168.10.2:5903"},
+    ];
+
     Rectangle {
+        //width: root.width;
         background: Theme.palette.background-gradient;
 
         VerticalLayout {
             padding-bottom: 50px;
-
             Header {}
-
+            
             i-page-scroll-view := PageScrollView {
-                vertical-stretch: 1;
-                page-count: 6;
+                horizontal-stretch: 1;
+                page-count: myguestos.length;
+           
+                for tile[i] in myguestos : PageContainer {
 
                 PageContainer {
                     //clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
-                    in-out property <bool> hit:false;
+                    in-out property <bool> hited:false;
                     callback click;
                     click => {
-                        self.hit = true
+                        self.hited = true
                     }
                     clicked => { 
-                        if (!self.hit){
+                        if (!self.hited){
                             i-page-scroll-view.toggle-selection(self.index, self.x); 
-                            Client.xview_connect();
+                            // 调用remote-viewer登录虚拟机
+                            Client.xview_connect(myguestos[i].guri, myguestos[i].gname);
                             self.click();
                         } else{
                             i-page-scroll-view.toggle-selection(self.index, self.x); 
-                            self.hit = false
+                            self.hited = false
                         }
 
                     }
 
-                    index: 0;
+                    index: i;
                     selected <=> i-page-scroll-view.selection;
                     selected-width: i-page-scroll-view.selected-width;
                     selected-height: i-page-scroll-view.selected-height;
                     selected-h-offset: i-page-scroll-view.selected-h-offset;
 
-                    //Overview {}
-                    Guestos {}
-                }
+                    Guestos {
+                        gname: myguestos[i].gname;
+                        gimage: Images.guestos_kylin;
 
-                PageContainer {
-                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
-
-                    index: 1;
-                    selected <=> i-page-scroll-view.selection;
-                    selected-width: i-page-scroll-view.selected-width;
-                    selected-height: i-page-scroll-view.selected-height;
-                    selected-h-offset: i-page-scroll-view.selected-h-offset;
-
-                    //Usage {}
-                    Guestos {}
-                }
-
-                PageContainer {
-                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
-
-                    index: 2;
-                    selected <=> i-page-scroll-view.selection;
-                    selected-width: i-page-scroll-view.selected-width;
-                    selected-height: i-page-scroll-view.selected-height;
-                    selected-h-offset: i-page-scroll-view.selected-h-offset;
-
-                    //Balance {}
-                    Guestos {}
-                }
-
-                PageContainer {
-                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
-
-                    index: 3;
-                    selected <=> i-page-scroll-view.selection;
-                    selected-width: i-page-scroll-view.selected-width;
-                    selected-height: i-page-scroll-view.selected-height;
-                    selected-h-offset: i-page-scroll-view.selected-h-offset;
-
-                    //Weather {}
-                    Guestos {}
-                }
-
-                PageContainer {
-                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
-
-                    index: 4;
-                    selected <=> i-page-scroll-view.selection;
-                    selected-width: i-page-scroll-view.selected-width;
-                    selected-height: i-page-scroll-view.selected-height;
-                    selected-h-offset: i-page-scroll-view.selected-h-offset;
-
-                    //About {}
-                    Guestos {}
-                }
-
-                PageContainer {
-                    clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
-
-                    index: 5;
-                    selected <=> i-page-scroll-view.selection;
-                    selected-width: i-page-scroll-view.selected-width;
-                    selected-height: i-page-scroll-view.selected-height;
-                    selected-h-offset: i-page-scroll-view.selected-h-offset;
-
-                    Guestos {}
-                }
-            }
-        }
+                    }
+                }//PageContainer
+            }//for
+        }//i-psv       
     }
 }
-
-
-
-
+}
 

@@ -2,49 +2,46 @@ import { VerticalBox , HorizontalBox, Button} from "std-widgets.slint";
 import { Button, VerticalBox, LineEdit, CheckBox,Spinner } from "std-widgets.slint";
 import { BorderlessWindow } from "borderless-window.slint";
 import { Images } from "../../ui/images.slint";
+import { Header, HeaderAdapter } from "./blocks/blocks.slint";
 
+export { Header, HeaderAdapter }
 export global Display {
     // 导出全局单例：Rust代码可以操作
     callback xview_display();
 }  
 
-export component LoginWindow inherits BorderlessWindow {
-    title: "欢迎登录云桌面";
-    preferred-width: 800px;
-    preferred-height: 440px;
+export component MyLoginWindow inherits BorderlessWindow {
+    title: "☁️";
+    icon: Images.logo;
+    preferred-width: 565px;
+    preferred-height: 410px;
     
-/*
     Image {
-        preferred-width: 480px;
-        preferred-height: 330px;
+        preferred-width: root.width;
+        preferred-height: root.height;
         source: Images.login;
-        //x: 0px;
-        //y: 0px;
     }
-    */
+    
 
     in-out property <string> lun;
     in-out property <string> lpw;
+    in-out property <int> ldays;
 
     callback close-window();
     callback hidden-window();
     callback login_check(string, string);
-    //callback minimized-window(bool);
-    //callback maximized-window(bool);
-    //callback move-window(length, length);
-    //callback mouse-down(int, int);
-    //callback mouse-move(int, int);
+    callback minimized-window(bool);
+    callback maximized-window(bool);
+    callback move-window(length, length);
+    callback mouse-down(int, int);
+    callback mouse-move(int, int);
+    callback display-license(int);
 
     on-close-window() => {
         close-window();
     }
 
-    hidden-window => {
-        self.title = "隐藏窗口";
-        self.height = 10px;
-        self.width = 10px;
-    }
- /*
+ 
     on-minimized-window(enable) => {
         minimized-window(enable);
     }
@@ -57,21 +54,38 @@ export component LoginWindow inherits BorderlessWindow {
         move-window(offset-x, offset-y);
     }
     
-*/
+
     GridLayout {
-        x: 400px;
+        //x: 400px;
         padding: 50px;
         spacing: 25px;
         
         Row {
            Text {
-                text: "登录云桌面";
+                text: "欢迎登录云桌面";
                 font-size: 24px;
                 color: white;
-                horizontal-alignment: left;
+                horizontal-alignment: center;
                 font-weight: 1000;                
            }
         }
+        Row {
+
+
+	    Header {}
+	    
+        /*
+            lic := Text {
+                 //text: "许可证剩余：【 "+ldays+" 】天";
+                 font-size: 12px;
+                 color: white;
+                 horizontal-alignment: center;
+                 font-weight: 800;                
+            }
+
+            */
+	   
+         }
         Row {
             un := LineEdit { // Username
                 horizontal-alignment: left;
@@ -79,7 +93,7 @@ export component LoginWindow inherits BorderlessWindow {
                 placeholder-text: "用户名";
                 text <=> root.lun;
                 height: 35px;
-                colspan: 2;
+                //colspan: 2;
             }
         
         }
@@ -91,25 +105,35 @@ export component LoginWindow inherits BorderlessWindow {
                 input-type: password;
                 text <=> root.lpw;
                 height: 35px;
-                colspan: 2;
+                accepted(text) => {
+                    root.hidden-window();
+                    root.login_check(un.text, pw.text);
+                    Display.xview_display();
+                    close-window();
+                }
             }
         }
+        
         CheckBox {
             height: 35px;
             horizontal-stretch: 1;
             text: "保存密码?";
 
-        }    
+        }  
+
         Row{
             Button {
                 text: "登录";
                 primary: true;
                 height: 35px;
                 clicked => {
+                    //root.display-license(ldays);
+                    root.hidden-window();
                     root.login_check(un.text, pw.text);
                     Display.xview_display();
                     close-window();
                 }
+                enabled: pw.text != "";
             }
         }
     }

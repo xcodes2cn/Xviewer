@@ -1,0 +1,18 @@
+// Copyright © SixtyFPS GmbH <info@slint.dev>
+// SPDX-License-Identifier: MIT
+
+export global HeaderAdapter {
+    in property <string> ldays;
+}
+
+export component Header {
+    in property <string> ldays <=> HeaderAdapter.ldays;
+
+    Text {
+         text: "许可证截止：【 "+ldays+" 】";
+         font-size: 12px;
+         color: white;
+         horizontal-alignment: center;
+         font-weight: 800;
+    }
+}

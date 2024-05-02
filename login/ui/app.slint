@@ -1,8 +1,9 @@
-import { VerticalBox , HorizontalBox, Button} from "std-widgets.slint";
-import { Button, VerticalBox, LineEdit, CheckBox,Spinner } from "std-widgets.slint";
+import { VerticalBox , HorizontalBox, Button, StandardButton, Palette } from "std-widgets.slint";
+import { Button, VerticalBox, LineEdit, CheckBox, Spinner } from "std-widgets.slint";
 import { BorderlessWindow } from "borderless-window.slint";
 import { Images } from "../../ui/images.slint";
 import { Header, HeaderAdapter } from "./blocks/blocks.slint";
+
 
 export { Header, HeaderAdapter }
 export global Display {
@@ -11,6 +12,7 @@ export global Display {
 }  
 
 export component MyLoginWindow inherits BorderlessWindow {
+
     title: "☁️";
     icon: Images.logo;
     preferred-width: 565px;
@@ -22,6 +24,31 @@ export component MyLoginWindow inherits BorderlessWindow {
         source: Images.login;
     }
     
+    show_confirm_popup => { confirm_popup.show(); }
+
+    confirm_popup := PopupWindow {
+        x: 40px;
+        y: 100px;
+        width: min(confirm_popup_layout.preferred-width, root.width - 80px);
+
+        Rectangle {
+            background: Palette.background;
+            border-color: Palette.border;
+            border-width: 1px;
+        }
+
+        confirm_popup_layout := Dialog {
+            height:100%; width: 100%;
+
+            confirm_popup_text := Text {
+                text: "【 用户名/密码 】错误，请重新输入！";
+                wrap: word-wrap;
+            }
+
+            //StandardButton { kind: yes; clicked => { root.popup_confirmed(); } }
+            StandardButton { kind: yes; }
+        }
+    }
 
     in-out property <string> lun;
     in-out property <string> lpw;
@@ -29,13 +56,15 @@ export component MyLoginWindow inherits BorderlessWindow {
 
     callback close-window();
     callback hidden-window();
-    callback login_check(string, string);
+    callback login_check(string, string) -> bool;
     callback minimized-window(bool);
     callback maximized-window(bool);
     callback move-window(length, length);
     callback mouse-down(int, int);
     callback mouse-move(int, int);
     callback display-license(int);
+    callback show_confirm_popup;
+    callback popup_confirmed();
 
     on-close-window() => {
         close-window();
@@ -106,10 +135,13 @@ export component MyLoginWindow inherits BorderlessWindow {
                 text <=> root.lpw;
                 height: 35px;
                 accepted(text) => {
-                    root.hidden-window();
-                    root.login_check(un.text, pw.text);
-                    Display.xview_display();
-                    close-window();
+                    if root.login_check(un.text, pw.text) {
+                        root.hidden-window();
+                        Display.xview_display();
+                        close-window();
+                    } else {
+                        root.show_confirm_popup();
+                    }
                 }
             }
         }
@@ -128,13 +160,24 @@ export component MyLoginWindow inherits BorderlessWindow {
                 height: 35px;
                 clicked => {
                     //root.display-license(ldays);
-                    root.hidden-window();
-                    root.login_check(un.text, pw.text);
-                    Display.xview_display();
-                    close-window();
+                    // test
+                    if root.login_check(un.text, pw.text) {
+                        root.hidden-window();
+                        Display.xview_display();
+                        close-window();
+                    } else {
+                        root.show_confirm_popup();
+                    }
                 }
                 enabled: pw.text != "";
             }
+
+            // test
+            //Button {
+            //    clicked => { root.show_confirm_popup(); }
+            //
+            //    text: "显示对话框";
+            //}
         }
     }
 }

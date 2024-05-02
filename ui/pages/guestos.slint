@@ -9,7 +9,21 @@ import { GroupBox } from "../widgets/group_box.slint";
 
 export component Guestos inherits Page {
     in property <string> gname;
-    in property <image> gimage;
+    in-out property <image> gimage: Images.guestos_kylin;
+    in property <string> gstatus;
+    in property <string> id;
+    callback set-gimage();
+
+    set-gimage() => {
+        if gstatus == "running" {
+            gimage = Images.guestos_kylin;
+        } else if gstatus == "busy" {
+            gimage = Images.guestos_kylin_busy
+        } else {
+            gimage = Images.guestos_kylin_offline;
+        }
+
+    }
 
     GroupBox {
         VerticalLayout {
@@ -18,7 +32,9 @@ export component Guestos inherits Page {
             alignment: start;
 
             Image {
+                //vertical-stretch: 0;
                 preferred-height: 550px;
+                //source: Images.guestos_kylin;
                 source: gimage;
             }
 
@@ -29,27 +45,15 @@ export component Guestos inherits Page {
                 color: Theme.palette.slint-blue-100;
                 font-size: Theme.typo.header-item.size;
                 font-weight: Theme.typo.header-item.weight;
+                wrap: word-wrap;
+                width: 150px;
+                //height: 100%;
             }
 
             // spacer
             Rectangle {
                 vertical-stretch: 1;
             }
-            /*
-            Text {
-                vertical-stretch: 0;
-                horizontal-alignment: center;
-                text: "Designed by";
-                color: Theme.palette.slint-blue-100;
-                font-size: Theme.typo.header-item.size;
-                font-weight: Theme.typo.header-item.weight;
-            }
-
-            Image {
-                preferred-height: 42px;
-                source: Images.spyrosoft-logo;
-            }
-            */
         }
     }
 }

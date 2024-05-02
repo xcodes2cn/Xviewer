@@ -3,6 +3,9 @@
 use std::fs::File;
 use std::io::Read;
 use slint::{ModelRc, VecModel};
+use chrono::Utc;
+use redis::Client;
+use redis::Commands;
 
 fn read_file_to_line(path: &str) -> Vec<String> {
     let mut file = File::open(path).unwrap();
@@ -62,32 +65,50 @@ pub fn main() {
     for line in contents {
         let words: Vec<&str> = line.split(" ").collect();
         println!("{:?}", words);
+        let first_word = words[0];
         let second_word = words[1];
         let fourth_word = words[3];
+        let fifth_word = words[4];
+        //let sixth_word = words[5];
+        println!("First word: {}", first_word);
         println!("Second word: {}", second_word);
         println!("Fourth word: {}", fourth_word);
+        println!("Fifth word: {}", fifth_word);
     
-        let new_words: Vec<&str> = vec![words[1], words[3]];
+        let new_words: Vec<&str> = vec![words[0], words[1], words[3], words[4]];
         println!("{:?}", new_words);
     
         guestos_data_vec.push(guestos_data {
+            gid: first_word.into(),
             gname: fourth_word.into(),
             guri: second_word.into(),
+            gstatus: fifth_word.into(),
         });
     }
 
     // 完成.rs数据到.slint数据模型转换
     let guestos_data_model: ModelRc<guestos_data> = ModelRc::new(VecModel::from(guestos_data_vec));
 
+    // 显示用户名
+    let path2 = "/tmp/.21845";
+    let content2 = read_file_to_line(path2);
+    println!("{:?}", content2);
+    
+    // 显示日期
+    let now = Utc::now();
+    let current_date = now.format("%Y-%m-%d").to_string();
+    println!("{}", current_date);
+
     let window = MainWindow::new().unwrap();
     let week = window.as_weak();
     let res=week.upgrade().unwrap();
 
-    // let default_myguestos = res.get_myguestos();
     // 给UI界面赋值
     res.set_myguestos(guestos_data_model);
+    res.set_uname(content2[0].clone().into());
+    //res.set_date(current_date.into());
     
-    window.global::<Client>().on_xview_connect({move |guri, gname| {
+    window.global::<VDIClient>().on_xview_connect({move |guri, gname| {
         //call_remote_viewer::run()
         
         let args = vec![guri, gname];
@@ -97,6 +118,20 @@ pub fn main() {
         call_remote_viewer::connect_with_args(&args_slice);
 
      }});
+
+    // 刷新登录的虚拟机状态为：busy
+    window.on_update_state(move |gid| {
+        // Connect to Redis server
+        let client = Client::open("redis://:redis-stack@10.8.8.2/").unwrap();
+        let mut connection = client.get_connection().unwrap();
+
+        let mykey = "state-".to_string() + gid.as_str();
+        redis::cmd("SET").arg(mykey.clone()).arg("busy").execute(&mut connection);
+        
+        // Update the key in Redis server
+        let value: String = connection.get(mykey.clone()).unwrap_or_default();
+        println!("虚拟机: {}, 更新后状态: {}", mykey, value);
+    });
 
     window.run().unwrap();
 
@@ -121,7 +156,6 @@ mod call_remote_viewer {
            .wait()
            .expect(&format!("Failed to wait external executable! ({program})"));
     }
-
 }
 
 /* 

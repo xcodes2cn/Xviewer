@@ -1,11 +1,12 @@
-# Xviewer v1.0.1 release
+# Xviewer v1.2.1 release
 
-* 完成rust代码和slint界面间自定义struct数据类型传递
-* 增加login界面回车响应和登录按钮UI逻辑
-* 更改临时文件路径
+* Login提示框
+* 主窗口显示登录用户名
+* slint issus #407 已解决
+* 增加虚拟机状态
 
 todo：
-* slint issus #407 
+* 虚拟机管理 
 * License 逻辑
-* Login 提示框
+* Agent状态上报
 * 保存密码

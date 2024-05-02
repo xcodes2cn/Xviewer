@@ -10,13 +10,15 @@ export global HeaderAdapter {
     in property <string> time;
     in property <string> time-suffix;
     in property <image> logo: Images.vdi_logo;
+    in property <string> uname;
 }
 
 export component Header {
-    in property <string> date <=> HeaderAdapter.date;
+    in property <string> date;
     in property <string> time <=> HeaderAdapter.time;
     in property <string> time-suffix <=> HeaderAdapter.time-suffix;
     in property <image> logo <=> HeaderAdapter.logo;
+    in property <string> uname;
 
     min-height: 50px;
     vertical-stretch: 0;
@@ -54,6 +56,15 @@ export component Header {
                 horizontal-alignment: right;
                 color: Theme.palette.white;
                 text: time;
+                font-size: Theme.typo.header-item.size;
+                font-weight: Theme.typo.header-item.weight;
+            }
+
+            i-uname := Text {
+                x:  i-time-suffix.x - 5px - self.width;
+                horizontal-alignment: right;
+                color: Theme.palette.white;
+                text: "用户【 " + uname + " 】";
                 font-size: Theme.typo.header-item.size;
                 font-weight: Theme.typo.header-item.weight;
             }

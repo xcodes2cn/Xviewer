@@ -63,14 +63,15 @@ export component PageContainer {
     in property <length> selected-width;
     in property <length> selected-h-offset;
 
-    //min-width: 320px;
-    min-width: 120px;
-    min-height: 240px;
+    //min-width: 120px;
+    //min-height: 120px;
+    min-width: 150px;
+    min-height: 150px;
     cache-rendering-hint: true;
 
     i-rect := Rectangle {
         //width: 50px;
-        height: parent.height;
+        height: parent.min-height;
         animate opacity { duration: Theme.durations.medium; }
 
         i-touch-area := TouchArea {}
@@ -95,6 +96,7 @@ export component PageContainer {
         }
     }
 
+    /*
     states [
         selected when selected == index : {
             min-width: selected-width;
@@ -110,6 +112,7 @@ export component PageContainer {
             i-rect.opacity: 0.0;
         }
     ]
+    */
 
     animate min-width { duration: Theme.durations.medium; }
 }
@@ -157,7 +160,7 @@ export component PageScrollView {
                     height: i-layout.preferred-height;
                     //width:  i-layout.preferred-width;
                     //test
-                    width: 2000px;
+                    width: i-layout.preferred-width;
                     padding: 20px;
                     spacing: 20px;
 

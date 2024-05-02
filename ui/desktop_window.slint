@@ -18,49 +18,41 @@ import { BarBackground } from "widgets/chart_pattern.slint";
 export { OverviewAdapter, UsageAdapter, Value, WeatherAdapter, MenuPageAdapter, MenuOverviewAdapter, SettingsAdapter,
     BarTileModel, Images, HeaderAdapter }
 
-export global Client {
+export global VDIClient {
     //in property <[guestos_data]> name;
     // 导出全局单例：Rust代码可以操作
     callback xview_connect(string, string);
+    callback guestosRunning(string) -> bool;
 }    
 
 // Added:
 export struct guestos_data {
+    gid: string,
     gname: string,
     guri: string,
+    gstatus: string,
 }
 
 export component MainWindow inherits Window {
 
-    title: "☁️";
+    title: "";
     icon: Images.logo;
-    min-width: 800px;
+    min-width: 1680px;
     min-height: 480px;
     background: Theme.palette.pure-black;
     preferred-height: 700px;
+    //preferred-width: 1920px;
     preferred-width: 100%;
 
+    in property <string> date;
+    in property <string> uname;    
     in property <[guestos_data]> myguestos: [
-        { gname: "综合桌面", guri: "spice://192.168.10.1:5905"},
-        { gname: "分析桌面", guri: "spice://192.168.10.1:5903"},
-        { gname: "监控桌面", guri: "spice://192.168.10.1:5901"},
-        { gname: "指挥桌面", guri: "spice://192.168.10.2:5901"},
-        { gname: "运行桌面", guri: "spice://192.168.10.2:5903"},
-        { gname: "Kylin桌面", guri: "spice://192.168.10.2:5903"},
-        { gname: "Windows桌面", guri: "spice://192.168.10.2:5903"},
-        { gname: "运行桌面2", guri: "spice://192.168.10.2:5903"},
-        { gname: "运行桌面3", guri: "spice://192.168.10.2:5903"},
-        { gname: "运行桌面4", guri: "spice://192.168.10.2:5903"},
-        { gname: "运行桌面5", guri: "spice://192.168.10.2:5903"},
-        { gname: "运行桌面6", guri: "spice://192.168.10.2:5903"},
-        { gname: "运行桌面7", guri: "spice://192.168.10.2:5903"},
-        { gname: "财务桌面", guri: "spice://192.168.10.2:5903"},
-        { gname: "IT桌面", guri: "spice://192.168.10.2:5903"},
-        { gname: "HR桌面", guri: "spice://192.168.10.2:5903"},
-        { gname: "运维桌面", guri: "spice://192.168.10.2:5903"},
-        { gname: "研发桌面", guri: "spice://192.168.10.2:5903"},
-        { gname: "行政桌面", guri: "spice://192.168.10.2:5903"},
+        { gid: "i-000001", gname: "综合桌面", guri: "spice://192.168.10.1:5905", gstatus: "running"},
+        { gid: "i-00000F", gname: "分析桌面", guri: "spice://192.168.10.1:5903", gstatus: "Shu"},
     ];
+
+    // 更新当前登录的虚拟机状态
+    callback update_state(string);
 
     Rectangle {
         //width: root.width;
@@ -68,49 +60,47 @@ export component MainWindow inherits Window {
 
         VerticalLayout {
             padding-bottom: 50px;
-            Header {}
+            Header {
+                uname: root.uname;
+                date: root.date;
+            }
             
-            i-page-scroll-view := PageScrollView {
-                horizontal-stretch: 1;
-                page-count: myguestos.length;
-           
-                for tile[i] in myguestos : PageContainer {
+            HorizontalLayout {
+                vertical-stretch: 1;
+                spacing: 25px;
+                padding-left: 25px;
+                padding-right: 25px;
+                width: 1680px;
+                //opacity: selection != -1 ? 0 : 1;
+                //animate opacity { duration: Theme.durations.medium; }
 
-                PageContainer {
-                    //clicked => { i-page-scroll-view.toggle-selection(self.index, self.x); }
-                    in-out property <bool> hited:false;
-                    callback click;
-                    click => {
-                        self.hited = true
-                    }
-                    clicked => { 
-                        if (!self.hited){
-                            i-page-scroll-view.toggle-selection(self.index, self.x); 
-                            // 调用remote-viewer登录虚拟机
-                            Client.xview_connect(myguestos[i].guri, myguestos[i].gname);
-                            self.click();
-                        } else{
-                            i-page-scroll-view.toggle-selection(self.index, self.x); 
-                            self.hited = false
-                        }
+                PageScrollView {
+                    
+                    for tile[i] in myguestos : PageContainer {
+                        PageContainer {
+                            clicked => { 
+                                // 更新虚拟机状态
+                                root.update_state(myguestos[i].gid);
 
-                    }
+                                // 进入远程桌面
+                                VDIClient.xview_connect(myguestos[i].guri, myguestos[i].gname); 
 
-                    index: i;
-                    selected <=> i-page-scroll-view.selection;
-                    selected-width: i-page-scroll-view.selected-width;
-                    selected-height: i-page-scroll-view.selected-height;
-                    selected-h-offset: i-page-scroll-view.selected-h-offset;
+                            }
+    
+                            Guestos {
+                                gname: myguestos[i].gname;
+                                gstatus: myguestos[i].gstatus;
 
-                    Guestos {
-                        gname: myguestos[i].gname;
-                        gimage: Images.guestos_kylin;
-
-                    }
-                }//PageContainer
-            }//for
-        }//i-psv       
+                                init => {
+                                    // 设置虚拟机状态
+                                    self.set-gimage();
+                                }
+                            }       
+                        }//PageContainer
+                    }//for
+                }//PageScrollView
+            }//HorizontalLayout
+        }
     }
-}
 }
 
